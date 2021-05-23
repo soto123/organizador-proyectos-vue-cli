@@ -4,18 +4,18 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title w-100" id="proyectoModalLabel">{{proyecto_seleccionado.nombre.toLocaleUpperCase()}}
-                    <!--
                         <button class="btn btn-success float-right ml-2 mr-2" @click="cambiar_estado('editar_proyecto')" v-if="estado_pagina !== 'editar_proyecto'" >Editar proyecto</button>
+                    <!--   
                         <button class="btn btn-danger float-right ml-2 mr-2" @click="cambiar_estado('ver_proyecto')" v-else>Cancelar</button>
-                        <button class="btn btn-success float-right" @click="cambiar_estado('añadir_tarea')" v-if="estado_pagina !== 'añadir_tarea'">Agregar tarea</button><button class="btn btn-danger float-right" @click="cambiar_estado('ver_proyecto')" v-else>Cancelar</button>
                     -->
+                        <button class="btn btn-success float-right" @click="cambiar_estado('añadir_tarea')" v-if="estado_pagina !== 'añadir_tarea'">Agregar tarea</button><button class="btn btn-danger float-right" @click="cambiar_estado('ver_proyecto')" v-else>Cancelar</button>
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <!--
+                    
                     <div class="contendor-add-tarea p-4 bg-light rounded border" v-if="estado_pagina === 'añadir_tarea'">
                         <div class="input-group">
                             <div class="input-group-prepend">
@@ -38,11 +38,13 @@
                         <div class="form-group pt-2">
                             <button class="btn btn-success w-100" @click="agregar_tarea()">Enviar</button>
                         </div>
+                        
                     </div>
+                    
                     <div class="contendor-edit-proyecto p-4 mb-3 bg-light rounded border" v-if="estado_pagina === 'editar_proyecto'">
                         <div class=" input-group">
-                            <input type="text" class="form-control" name="nombre_proyecto" v-model="proyecto_seleccionado.nombre">
-                            <select v-model="proyecto_seleccionado.estado">
+                            <input type="text" class="form-control" name="nombre_proyecto" v-model="proyecto_seleccionado_editado.nombre">
+                            <select v-model="proyecto_seleccionado_editado.estado">
                                 <option class="form-control custom-select" v-for="item in estados" v-bind:key="item.id" :value="item.id"> {{item.nombre}} </option>
                             </select>	
                         </div>
@@ -50,19 +52,9 @@
                             <button class="btn btn-primary w-100 " @click="actualizar_proyecto()">Guardar</button>
                         </div>
                     </div>
+                    <!-- TABLA DE TAREAS -->
                     <div class="accordion row" id="accordionExample">
-                        <div class="col-md-3">
-                            <div class="card">
-                                <div class="card-header" id="headingOne">
-                                    <h2 class="mb-0">
-                                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        Equipo 1
-                                    </button>
-                                    </h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-9">
+                        <div class="col-md-12">
                             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
                                 <div class="card-body">
                                 <table class="table table-striped">
@@ -96,7 +88,6 @@
                             </div>
                         </div>
                     </div>
-                    -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -114,30 +105,54 @@ export default {
     data (){
         return{
             //: {"id":"22","nombre":"Organizador de proyectos - VUE CLI","imagen":"imagen estado nuevo","estado":"0"},
-            //estado_pagina : false,
-            //proyecto_seleccionado: '',
+            estado_pagina : 'ver_proyecto',
+            nueva: {"id":-1,"nombre":"","proyecto":"0","prioridad":"10","estado":"0"},
+            proyecto_seleccionado_editado: {"id":"22","nombre":"Organizador de proyectos - VUE CLI","imagen":"imagen estado nuevo","estado":"0"},
+            notificar_usuarios: Array,
+            //tareas: Array,
         }
     },
     props:{
-        //usuarios: [{"id":"1","nombre":"Borja Soto","imagen":"https://hatchtemuco.com/img/borja.jpg","correo":"borja@hatchtemuco.com","equipo":"0"},{"id":"2","nombre":"Constanza Garces","imagen":"https://hatchtemuco.com/img/user.png","correo":"constanza@hatchtemuco.com","equipo":"0"},{"id":"3","nombre":"David Sepulveda","imagen":"https://hatchtemuco.com/img/david.jpg","correo":"david@hatchtemuco.com","equipo":"0"},{"id":"4","nombre":"hatchtemuco","imagen":"https://hatchtemuco.com/img/profile-hatch.jpg","correo":"contacto@hatchtemuco.com","equipo":"0"},{"id":"18","nombre":"Benjamin Pardo","imagen":"https://hatchtemuco.com/img/david.jpg","correo":"benjamin@hatchtemuco.com","equipo":"0"}],
-        //estados: [{"id":"7","nombre":"Proyecto finalizado","imagen":"Imagen de finalizado"},{"id":"6","nombre":"Marketing","imagen":"Imagen de marketing"},{"id":"5","nombre":"Post venta web","imagen":"Imagen de postventa w"},{"id":"4","nombre":"Sitio web entregado","imagen":"Imagen de sitio entregado"},{"id":"3","nombre":"Implementacion","imagen":"Imagen de Implementacion"},{"id":"2","nombre":"diseño","imagen":"Imagen de diseño"},{"id":"1","nombre":"captacion","imagen":"imagen captacion"}],
-        //tareas: Array,
+        usuarios: Array,
+        estados: Array,
+        tareas: Array,
         proyecto_seleccionado: Object,
     },
     methods: {
-        /*
-        cambiar_estado : function(){
-            alert("cambiar estado");
+        cambiar_estado : function( estado ){
+            this.estado_pagina = estado;
+            console.log("Cabmio estado modal "+this.estado_pagina);
         },
         agregar_tarea: function(){
-            alert("Agregar tarea");
+            this.nueva.proyecto = this.proyecto_seleccionado.id;
+            console.log(this.nueva,this.notificar_usuarios);
         },
-        actualizar_proyecto: function(){
+        actualizar_proyecto: function(){//SOLUCIONAR PROBLEMA DE CONSULTAS "PATCH" EN EL SERVIDOR
             alert("Actualizar proyecto");
+            console.log('ENVIAR CONSULTA AL SERVIDOR :',this.proyecto_seleccionado_editado);
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(this.responseText + "response");
+                }
+            };
+            xhttp.open("PATCH", "http://proyectos.hatchtemuco.com/api/proyecto/"+this.proyecto_seleccionado.id+"/estado/"+this.proyecto_seleccionado_editado.estado+"/", false);
+            xhttp.send();
+            var xhttp2 = new XMLHttpRequest();
+            xhttp2.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(this.responseText + "response");
+                }
+            };
+            xhttp2.open("PATCH", "http://proyectos.hatchtemuco.com/api/proyecto/"+this.proyecto_seleccionado.id+"/nombre/"+this.proyecto_seleccionado_editado.nombre+"/", false);
+            xhttp2.send();
+            this.cambiar_estado('ver_proyecto');
+            this.$emit('getDatos');
         },
         get_prioridad_by_id: function(item){
-            alert("get prioridad by id"+item);
-        },
+            return item.prioridad;
+            
+        },/*
         editar_estado_tarea: function(num, item){
             alert("Editar estado tarea"+num+item);
         },

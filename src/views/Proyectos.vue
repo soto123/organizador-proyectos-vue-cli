@@ -17,13 +17,13 @@
                     <tr><th scope="col">ID</th><th scope="col">Imagen</th><th scope="col">Nombre</th><th scope="col">Otro</th></tr>
                 </thead>
                 <tbody class="" id="contenido-tabla">
-                    <proyecto-fila-proyecto v-for="item in proyectos" v-bind:key="item.id" v-bind:proyecto="item" v-bind:estados="estados" v-on:cargar_proyecto="cargar_proyecto" v-on:eliminar_proyecto="eliminar_proyecto(item)"></proyecto-fila-proyecto>					
+                    <proyecto-fila-proyecto v-for="item in proyectos" v-bind:key="item.id" v-bind:proyecto="item" v-bind:estados="estados" v-on:cargar_proyecto="cargar_proyecto" v-on:eliminar_proyecto="eliminar_proyecto"></proyecto-fila-proyecto>					
                 </tbody>
             </table>
         </div>	
         <!-- AGREGAR MODAL NEVO PROYECTO -->
         <modal-nuevo-proyecto v-on:getDatos="getDatos()"></modal-nuevo-proyecto>
-        <modal-proyecto-unico v-bind:proyecto_seleccionado="proyecto_seleccionado"></modal-proyecto-unico>
+        <modal-proyecto-unico v-on:getDatos="getDatos()" v-bind:proyecto_seleccionado="proyecto_seleccionado" v-bind:usuarios="usuarios" v-bind:estados="estados" v-bind:tareas="tareas"></modal-proyecto-unico>
     </div>
 </template>
 
@@ -91,7 +91,7 @@ export default {
             xhttp3.open("GET", "http://proyectos.hatchtemuco.com/api/usuario/1/tipo/0/", false);
             xhttp3.send();
             this.usuarios = JSON.parse(data_usuarios);
-
+            /*
             var data_tareas = '';
             var xhttp_tareas = new XMLHttpRequest();
             xhttp_tareas.onreadystatechange = function() {
@@ -103,6 +103,7 @@ export default {
             xhttp_tareas.open("GET", "http://proyectos.hatchtemuco.com/api/tarea/", false);
             xhttp_tareas.send();
             this.tareas = JSON.parse(data_tareas);
+            */
             //this.proyectos = [{"id":"20","nombre":"Studio Karun","imagen":"https://proyectos.hatchtemuco.com/img/logo-nueva-web.png","estado":"5"},{"id":"17","nombre":"RayCafeDelSur","imagen":"https://proyectos.hatchtemuco.com/img/logoRayCafedelSur.jpg","estado":"7"},{"id":"10","nombre":"FJL - arquitectos","imagen":"http://www.fjl.cl/wp-content/uploads/2020/11/NUEVO-LOGO-FJL.png","estado":"4"},{"id":"9","nombre":"Pintaraucania","imagen":"https://www.pintaraucania.cl/wp-content/uploads/2020/11/logo-blanco.png","estado":"7"},{"id":"8","nombre":"Vivero Sol y Tierra","imagen":"https://viverosolytierra.cl/wp-content/uploads/2019/03/cropped-2019-03-27-1-134x71.png","estado":"7"},{"id":"7","nombre":"Paillahue Pucon","imagen":"http://paillahuepucon.cl/wp-content/uploads/2020/09/placeholder.png","estado":"5"},{"id":"6","nombre":"AntunezKetterer","imagen":"https://antunezketterer.cl/wp-content/uploads/2020/09/sostenible-y-circular-1-min.jpg","estado":"7"},{"id":"5","nombre":"Tienda ecomemorable","imagen":"https://proyectos.hatchtemuco.com/img/Logo-Ecomemorable-Tienda.png","estado":"7"},{"id":"3","nombre":"Hatchtemuco","imagen":"https://www.hatchtemuco.com/img/logotipo.png","estado":"6"},{"id":"2","nombre":"Geosur - turismo","imagen":"https://geosurturismo.com/wp-content/uploads/2020/10/logo_geosur_a.png","estado":"7"}];
             //this.estados = [{"id":"7","nombre":"Proyecto finalizado","imagen":"Imagen de finalizado"},{"id":"6","nombre":"Marketing","imagen":"Imagen de marketing"},{"id":"5","nombre":"Post venta web","imagen":"Imagen de postventa w"},{"id":"4","nombre":"Sitio web entregado","imagen":"Imagen de sitio entregado"},{"id":"3","nombre":"Implementacion","imagen":"Imagen de Implementacion"},{"id":"2","nombre":"diseño","imagen":"Imagen de diseño"},{"id":"1","nombre":"captacion","imagen":"imagen captacion"}];
             //this.usuarios = [{"id":"1","nombre":"Borja Soto","imagen":"https://hatchtemuco.com/img/borja.jpg","correo":"borja@hatchtemuco.com","equipo":"0"},{"id":"2","nombre":"Constanza Garces","imagen":"https://hatchtemuco.com/img/user.png","correo":"constanza@hatchtemuco.com","equipo":"0"},{"id":"3","nombre":"David Sepulveda","imagen":"https://hatchtemuco.com/img/david.jpg","correo":"david@hatchtemuco.com","equipo":"0"},{"id":"4","nombre":"hatchtemuco","imagen":"https://hatchtemuco.com/img/profile-hatch.jpg","correo":"contacto@hatchtemuco.com","equipo":"0"},{"id":"18","nombre":"Benjamin Pardo","imagen":"https://hatchtemuco.com/img/david.jpg","correo":"benjamin@hatchtemuco.com","equipo":"0"}];
@@ -110,8 +111,33 @@ export default {
         },
         cargar_proyecto: function(item){
             this.proyecto_seleccionado = item;
-            console.log(this.proyecto_seleccionado);
-
+            console.log(this.proyecto_seleccionado.id);
+            //var array = [];
+            
+            var data_tareas = '';
+            var xhttp_tareas = new XMLHttpRequest();
+            xhttp_tareas.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                // Typical action to be performed when the document is ready:
+                data_tareas = this.responseText;
+                }
+            };
+            xhttp_tareas.open("GET", "http://proyectos.hatchtemuco.com/api/tarea/1/proyecto/"+item.id+"/", false);
+            xhttp_tareas.send();
+            this.tareas = JSON.parse(data_tareas);
+            console.log(this.tareas);
+        },
+        eliminar_proyecto: function( item ){//SOLUCIONAR PROBLEMA DE CONSULTAS "DELETE" EN EL SERVIDOR
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    // Typical action to be performed when the document is ready:
+                    console.log("enviado");
+                }
+            };
+            xhttp.open("DELETE", "http://proyectos.hatchtemuco.com/api/proyecto/"+item.id+"/", false);
+            xhttp.send();
+            this.getDatos();
         }
     },
     mounted: function () {
